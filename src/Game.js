@@ -10,7 +10,7 @@ class Game extends Component {
       // state
       position: [0, 0], //x,y
       speed: [0, 0],
-      ship: 'null',
+
       engines: false,
       turnLeft: false,
       turnRight: false,
@@ -110,7 +110,6 @@ class Game extends Component {
   componentDidMount() {
     window.addEventListener("keydown", this._handleKeyPress.bind(this));
     window.addEventListener("keyup", this._handleKeyUp.bind(this));
-    this.setState({ship:this.refs.ship});
     this.countdown = setInterval(this._tick.bind(this), 33);
   }
 
@@ -129,7 +128,7 @@ class Game extends Component {
               style={{  height:this.state.floor+64, // TODO: remove hack for ship height
                         width:this.state.width,
         }}>
-          <img  id="ship" ref="ship"
+          <img  id="ship"
                 style={{  bottom:this.state.position[1],
                           left:this.state.position[0],
                           transform:'rotate('+this.state.rotation+'deg)'}}
