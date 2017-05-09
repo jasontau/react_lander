@@ -2,17 +2,14 @@
   text-align: center;
 }
 
+.game {
+  border-style: solid;
+}
+
 .ship {
-  height: 80px;
+  height: 64px;
   position: relative;
   bottom: -600px;
-}
-
-.impulse {
-  animation: impulse infinite 2s linear;
-}
-
-.fall {
 }
 
 .App-header {
