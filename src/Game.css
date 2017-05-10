@@ -4,12 +4,16 @@
 
 .game {
   border-style: solid;
+  position: relative;
+}
+
+.pad {
+  height: 10px;
+  border-style: solid;
 }
 
 .ship {
-  height: 64px;
   position: relative;
-  bottom: -600px;
 }
 
 .App-header {

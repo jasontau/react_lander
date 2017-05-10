@@ -15,10 +15,14 @@ class Game extends Component {
       turnLeft: false,
       turnRight: false,
       rotation: 0,
+      shipSize: 64,
+      ship: null,
 
       // level
       floor: 600,
       width: 900,
+      pad: Math.floor(Math.random()* 800),
+      padSize: 100,
 
       // game settings
       rotationRate: 5,
@@ -82,6 +86,9 @@ class Game extends Component {
       speed[1] = speed[1] - this.state.gravity;
     } else {
       speed = [0,0];
+      if (this._checkWin()) {
+        console.log("win")
+      }
     }
 
     speed[0] = speed[0] + thrust[0];
@@ -91,6 +98,13 @@ class Game extends Component {
     position[1] = position[1] + speed[1];
 
     this.setState({position: position, speed: speed, rotation: rotation});
+  }
+
+  _checkWin(){
+    let shipPosition = this.state.ship.getBoundingClientRect()["left"];
+    //TODO: hack as the ship graphic is a few pixels in from the borders
+    return shipPosition+10 > this.state.pad
+            && (shipPosition+this.state.shipSize-17) < this.state.pad + this.state.padSize;
   }
 
   _getThrust(rotation) {
@@ -110,6 +124,7 @@ class Game extends Component {
   componentDidMount() {
     window.addEventListener("keydown", this._handleKeyPress.bind(this));
     window.addEventListener("keyup", this._handleKeyUp.bind(this));
+    this.setState({ship:this.refs.ship});
     this.countdown = setInterval(this._tick.bind(this), 33);
   }
 
@@ -125,17 +140,20 @@ class Game extends Component {
     return (
       <div className="App">
         <div className="game"
-              style={{  height:this.state.floor+64, // TODO: remove hack for ship height
+              style={{  height:this.state.floor+this.state.shipSize,
                         width:this.state.width,
         }}>
-          <img  id="ship"
+          <img  id="ship" ref="ship"
                 style={{  bottom:this.state.position[1],
                           left:this.state.position[0],
-                          transform:'rotate('+this.state.rotation+'deg)'}}
+                          transform:'rotate('+this.state.rotation+'deg)',
+                          height: this.state.shipSize,
+                        }}
                 src={require("../src/spaceship.png")}
                 className={'ship'}
                 alt="logo" />
         </div>
+        <div className="pad" style={{ marginLeft: this.state.pad+"px", width:this.state.padSize}}/>
       </div>
     );
   }
