@@ -21,6 +21,7 @@ class Game extends Component {
       ship: null,
       gameState: "",
       shipSrc: require("../src/spaceship.png"),
+      fuel: 900,
 
       // crash states
       onPad: false,
@@ -66,9 +67,10 @@ class Game extends Component {
   _updateCrashStates(){
     let shipPosition = this.state.ship.getBoundingClientRect()["left"];
     this.setState({
-      onPad:shipPosition+10 > this.state.pad && (shipPosition+this.state.shipSize-17) < this.state.pad + this.state.padSize,
-      onSpeed:this.state.speed[1] >= -gameSettings.MAX_LANDING_SPEED,
-      onRotation:Math.abs(this.state.rotation) <= gameSettings.MAX_LANDING_ROTATION,
+      onPad:      shipPosition+10 > this.state.pad
+                  && (shipPosition+this.state.shipSize-17) < this.state.pad + this.state.padSize,
+      onSpeed:    this.state.speed[1] >= -gameSettings.MAX_LANDING_SPEED,
+      onRotation: Math.abs(this.state.rotation) <= gameSettings.MAX_LANDING_ROTATION,
     });
   }
 
@@ -79,12 +81,13 @@ class Game extends Component {
   _tick() {
     let position = this.state.position.slice();
     let speed = this.state.speed.slice();
-    let rotation = this.state.rotation
-    let thrust = this.state.engines ? this._getThrust(rotation) : [0,0];
+    let rotation = this.state.rotation;
+    let thrust = [0,0];
+    let fuel = this.state.fuel;
 
     this._updateCrashStates()
 
-    // -180 to 180 rotation
+    // Handle rotation: -180 to 180 rotation
     if (this.state.turnRight){
       rotation = this.state.rotation + gameSettings.ROTATION_RATE;
       if (rotation > 180) {
@@ -97,6 +100,14 @@ class Game extends Component {
       }
     }
 
+    // Handle fuel
+    if (this.state.engines && fuel > 0) {
+      fuel = fuel - 5
+      thrust = this._getThrust(rotation)
+    }
+
+
+    // Handle position
     if (this.state.position[1] > this.state.floor * -1){
       speed[1] = speed[1] - gameSettings.GRAVITY;
     } else {
@@ -116,7 +127,7 @@ class Game extends Component {
     position[0] = position[0] + speed[0];
     position[1] = position[1] + speed[1];
 
-    this.setState({position: position, speed: speed, rotation: rotation});
+    this.setState({position: position, speed: speed, rotation: rotation, fuel: fuel});
   }
 
   _checkWin(){
@@ -161,17 +172,10 @@ class Game extends Component {
   render() {
     return (
       <div className="App">
-        <div>{this.state.gameState}</div>
-        <Hud  hvel={this.state.speed[0]}
-              vvel={this.state.speed[1]}
-              rotation={this.state.rotation}
-              onPad={this.state.onPad}
-              onSpeed={this.state.onSpeed}
-              onRotation={this.state.onRotation}/>
+
         <div className="game"
               style={{  height:this.state.floor+this.state.shipSize,
-                        width:this.state.width,
-        }}>
+                        width:this.state.width,}}>
           <img  id="ship" ref="ship"
                 style={{  bottom:this.state.position[1],
                           left:this.state.position[0],
@@ -181,7 +185,15 @@ class Game extends Component {
                 src={this.state.shipSrc}
                 className={'ship'}
                 alt="logo" />
+          <Hud  hvel={this.state.speed[0]}
+                vvel={this.state.speed[1]}
+                rotation={this.state.rotation}
+                onPad={this.state.onPad}
+                onSpeed={this.state.onSpeed}
+                onRotation={this.state.onRotation}
+                fuel={this.state.fuel}/>
           <div className="pad" style={{ marginLeft: this.state.pad+"px", width:this.state.padSize}}/>
+          <div className="game-over">{this.state.gameState}</div>
         </div>
         <div className="moon" style={{width:this.state.width}}></div>
 
