@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import {gameSettings} from './gameSettings';
+import Hud from './hud/hud';
 import logo from './logo.svg';
 import './Game.css';
 
@@ -17,17 +19,13 @@ class Game extends Component {
       rotation: 0,
       shipSize: 64,
       ship: null,
+      gameState: "",
 
       // level
       floor: 600,
       width: 900,
       pad: Math.floor(Math.random()* 800),
       padSize: 100,
-
-      // game settings
-      rotationRate: 5,
-      thrust: 0.3,
-      gravity: 0.05,
     }
   }
 
@@ -59,7 +57,7 @@ class Game extends Component {
     }
   }
 
-  // ******** Game Loop function ********
+  // =========== Game Loop function ===========
   // all operations on game pawn handled here for consistent player feedback
   // and to minimize any problems with multiple user inputs, eg. turn left and
   // right at the same time.
@@ -71,23 +69,23 @@ class Game extends Component {
 
     // -180 to 180 rotation
     if (this.state.turnRight){
-      rotation = this.state.rotation + this.state.rotationRate;
+      rotation = this.state.rotation + gameSettings.ROTATION_RATE;
       if (rotation > 180) {
         rotation = rotation - 360;
       }
     } else if (this.state.turnLeft){
-      rotation = this.state.rotation - this.state.rotationRate;
+      rotation = this.state.rotation - gameSettings.ROTATION_RATE;
       if (rotation < -180) {
         rotation = rotation + 360;
       }
     }
 
     if (this.state.position[1] > this.state.floor * -1){
-      speed[1] = speed[1] - this.state.gravity;
+      speed[1] = speed[1] - gameSettings.GRAVITY;
     } else {
       speed = [0,0];
       if (this._checkWin()) {
-        console.log("win")
+        this.setState({gameState: "You Win!"})
       }
     }
 
@@ -98,11 +96,15 @@ class Game extends Component {
     position[1] = position[1] + speed[1];
 
     this.setState({position: position, speed: speed, rotation: rotation});
+
+    if (this.state.gameState === "You Win!"){
+      clearInterval(this.tick);
+    }
   }
 
   _checkWin(){
     let shipPosition = this.state.ship.getBoundingClientRect()["left"];
-    //TODO: hack as the ship graphic is a few pixels in from the borders
+    //TODO: remove hack as the ship graphic is a few pixels in from the borders
     return shipPosition+10 > this.state.pad
             && (shipPosition+this.state.shipSize-17) < this.state.pad + this.state.padSize;
   }
@@ -116,22 +118,23 @@ class Game extends Component {
 
     let dir_index = Math.floor(Math.abs(rotation) / 90)
 
-    return [  this.state.thrust * x_thrust * x_dir,
-              this.state.thrust * (1-x_thrust) * y_dir[dir_index]
+    return [  gameSettings.THRUST * x_thrust * x_dir,
+              gameSettings.THRUST * (1-x_thrust) * y_dir[dir_index]
             ]
   }
 
+  // TODO: look for alternatives to attaching to window DOM
   componentDidMount() {
     window.addEventListener("keydown", this._handleKeyPress.bind(this));
     window.addEventListener("keyup", this._handleKeyUp.bind(this));
     this.setState({ship:this.refs.ship});
-    this.countdown = setInterval(this._tick.bind(this), 33);
+    this.tick = setInterval(this._tick.bind(this), 33);
   }
 
   componentWillUnmount() {
     window.removeEventListener("keydown", this._handleKeyPress.bind(this));
     window.removeEventListener("keyup", this._handleKeyUp.bind(this));
-    clearInterval(this.countdown)
+    clearInterval(this.tick)
   }
 
   // =========================================
@@ -139,6 +142,8 @@ class Game extends Component {
   render() {
     return (
       <div className="App">
+        <div>{this.state.gameState}</div>
+        <Hud hvel={this.state.speed[0]} vvel={this.state.speed[1]}/>
         <div className="game"
               style={{  height:this.state.floor+this.state.shipSize,
                         width:this.state.width,
@@ -152,8 +157,10 @@ class Game extends Component {
                 src={require("../src/spaceship.png")}
                 className={'ship'}
                 alt="logo" />
+          <div className="pad" style={{ marginLeft: this.state.pad+"px", width:this.state.padSize}}/>
         </div>
-        <div className="pad" style={{ marginLeft: this.state.pad+"px", width:this.state.padSize}}/>
+        <div className="moon" style={{width:this.state.width}}></div>
+
       </div>
     );
   }
