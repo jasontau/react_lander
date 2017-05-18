@@ -1,15 +1,30 @@
 .App {
-  text-align: center;
+}
+
+.hud {
 }
 
 .game {
-  border-style: solid;
+  position: relative;
+  background-image: url("background.jpg");
+}
+
+.pad {
+  position: absolute;
+  height: 10px;
+  border-color: red;
+  bottom: 0px;
+  background-image: url("moon.jpg");
+}
+
+.moon {
+  height: 30px;
+  background-image: url("moon.jpg");
 }
 
 .ship {
-  height: 64px;
   position: relative;
-  bottom: -600px;
+  text-align: center;
 }
 
 .App-header {
@@ -21,11 +36,6 @@
 
 .App-intro {
   font-size: large;
-}
-
-@keyframes impulse {
-  from { transform: scale(1); }
-  to { transform: scale(2); }
 }
 
 @keyframes App-logo-spin {
