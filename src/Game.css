@@ -4,6 +4,14 @@
 .hud {
 }
 
+.status-good {
+  color: green;
+}
+
+.status-bad {
+  color: red;
+}
+
 .game {
   position: relative;
   background-image: url("background.jpg");
@@ -25,6 +33,12 @@
 .ship {
   position: relative;
   text-align: center;
+}
+
+.explosion {
+  position: relative;
+  text-align: center;
+  visibility: hidden;
 }
 
 .App-header {

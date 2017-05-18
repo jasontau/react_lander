@@ -20,6 +20,12 @@ class Game extends Component {
       shipSize: 64,
       ship: null,
       gameState: "",
+      shipSrc: require("../src/spaceship.png"),
+
+      // crash states
+      onPad: false,
+      onSpeed: false,
+      onRotation: false,
 
       // level
       floor: 600,
@@ -57,6 +63,15 @@ class Game extends Component {
     }
   }
 
+  _updateCrashStates(){
+    let shipPosition = this.state.ship.getBoundingClientRect()["left"];
+    this.setState({
+      onPad:shipPosition+10 > this.state.pad && (shipPosition+this.state.shipSize-17) < this.state.pad + this.state.padSize,
+      onSpeed:this.state.speed[1] >= -gameSettings.MAX_LANDING_SPEED,
+      onRotation:Math.abs(this.state.rotation) <= gameSettings.MAX_LANDING_ROTATION,
+    });
+  }
+
   // =========== Game Loop function ===========
   // all operations on game pawn handled here for consistent player feedback
   // and to minimize any problems with multiple user inputs, eg. turn left and
@@ -66,6 +81,8 @@ class Game extends Component {
     let speed = this.state.speed.slice();
     let rotation = this.state.rotation
     let thrust = this.state.engines ? this._getThrust(rotation) : [0,0];
+
+    this._updateCrashStates()
 
     // -180 to 180 rotation
     if (this.state.turnRight){
@@ -83,10 +100,14 @@ class Game extends Component {
     if (this.state.position[1] > this.state.floor * -1){
       speed[1] = speed[1] - gameSettings.GRAVITY;
     } else {
-      speed = [0,0];
-      if (this._checkWin()) {
+
+      if (this.state.onSpeed && this.state.onPad && this.state.onRotation){
         this.setState({gameState: "You Win!"})
+      } else {
+        this.setState({gameState: "You Crashed!", shipSrc:require("../src/Explosion.png")})
       }
+      clearInterval(this.tick);
+      speed = [0,0];
     }
 
     speed[0] = speed[0] + thrust[0];
@@ -96,20 +117,18 @@ class Game extends Component {
     position[1] = position[1] + speed[1];
 
     this.setState({position: position, speed: speed, rotation: rotation});
-
-    if (this.state.gameState === "You Win!"){
-      clearInterval(this.tick);
-    }
   }
 
   _checkWin(){
     let shipPosition = this.state.ship.getBoundingClientRect()["left"];
     //TODO: remove hack as the ship graphic is a few pixels in from the borders
-    return shipPosition+10 > this.state.pad
-            && (shipPosition+this.state.shipSize-17) < this.state.pad + this.state.padSize;
+    let onPad = shipPosition+10 > this.state.pad && (shipPosition+this.state.shipSize-17) < this.state.pad + this.state.padSize;
+    let didNotCrash = this.state.speed[1] <= gameSettings.MAX_LANDING_SPEED;
+    return onPad && didNotCrash;
   }
 
   _getThrust(rotation) {
+    // rotation multiplied by directional matrices
     let y_dir = [1, -1, -1]
     let x_dir = rotation >= 0 ? 1 : -1
 
@@ -143,7 +162,12 @@ class Game extends Component {
     return (
       <div className="App">
         <div>{this.state.gameState}</div>
-        <Hud hvel={this.state.speed[0]} vvel={this.state.speed[1]}/>
+        <Hud  hvel={this.state.speed[0]}
+              vvel={this.state.speed[1]}
+              rotation={this.state.rotation}
+              onPad={this.state.onPad}
+              onSpeed={this.state.onSpeed}
+              onRotation={this.state.onRotation}/>
         <div className="game"
               style={{  height:this.state.floor+this.state.shipSize,
                         width:this.state.width,
@@ -154,7 +178,7 @@ class Game extends Component {
                           transform:'rotate('+this.state.rotation+'deg)',
                           height: this.state.shipSize,
                         }}
-                src={require("../src/spaceship.png")}
+                src={this.state.shipSrc}
                 className={'ship'}
                 alt="logo" />
           <div className="pad" style={{ marginLeft: this.state.pad+"px", width:this.state.padSize}}/>
