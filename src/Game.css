@@ -7,6 +7,28 @@
   padding-right: 10px;
 }
 
+.main-menu {
+  margin: auto;
+  align-content: center;
+  text-align: center;
+  background-color: rgba(196, 196, 196, .7);
+  width: 70%;
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.main-menu .start-button {
+  background-color: #4CAF50; /* Green */
+  border-radius: 10px;
+  color: white;
+  padding: 15px;
+  margin: 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
 .status-good {
   color: green;
 }
@@ -60,9 +82,4 @@
 
 .App-intro {
   font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from { transform: scale(1); }
-  to { transform: scale(2); }
 }

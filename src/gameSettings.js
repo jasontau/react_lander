@@ -7,3 +7,17 @@ export const gameSettings = {
     MAX_LANDING_SPEED:5,
     MAX_LANDING_ROTATION: 20,
 }
+
+export const gameStartState = {
+  position: [0, 0], //x,y
+  speed: [0, 0],
+
+  engines: false,
+  turnLeft: false,
+  turnRight: false,
+  rotation: 0,
+  shipSize: 64,
+  gameState: "",
+  shipSrc: require("../src/spaceship.png"),
+  fuel: 900,
+}

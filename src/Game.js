@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import {gameSettings} from './gameSettings';
+import {gameSettings, gameStartState} from './gameSettings';
 import Hud from './hud/hud';
+import MainMenu from './mainmenu/mainmenu';
 import logo from './logo.svg';
 import './Game.css';
 
@@ -22,6 +23,9 @@ class Game extends Component {
       gameState: "",
       shipSrc: require("../src/spaceship.png"),
       fuel: 900,
+
+      // menu
+      mainMenu: true,
 
       // crash states
       onPad: false,
@@ -111,12 +115,15 @@ class Game extends Component {
     if (this.state.position[1] > this.state.floor * -1){
       speed[1] = speed[1] - gameSettings.GRAVITY;
     } else {
-
+      let gameState = null;
       if (this.state.onSpeed && this.state.onPad && this.state.onRotation){
-        this.setState({gameState: "You Win!"})
+        gameState = {gameState: "You Win!"};
       } else {
-        this.setState({gameState: "You Crashed!", shipSrc:require("../src/Explosion.png")})
+        gameState = {gameState: "You Crashed!", shipSrc:require("../src/Explosion.png")};
       }
+
+      let endState = Object.assign({}, gameState, {mainMenu: true});
+      this.setState(endState);
       clearInterval(this.tick);
       speed = [0,0];
     }
@@ -153,12 +160,17 @@ class Game extends Component {
             ]
   }
 
+  _startGame = () => {
+    let startState = Object.assign({}, {mainMenu: false}, gameStartState);
+    this.setState(startState);
+    this.tick = setInterval(this._tick.bind(this), 33);
+  }
+
   // TODO: look for alternatives to attaching to window DOM
   componentDidMount() {
     window.addEventListener("keydown", this._handleKeyPress.bind(this));
     window.addEventListener("keyup", this._handleKeyUp.bind(this));
     this.setState({ship:this.refs.ship});
-    this.tick = setInterval(this._tick.bind(this), 33);
   }
 
   componentWillUnmount() {
@@ -185,7 +197,8 @@ class Game extends Component {
                 src={this.state.shipSrc}
                 className={'ship'}
                 alt="logo" />
-          <Hud  hvel={this.state.speed[0]}
+          <Hud  mainMenu={this.state.mainMenu}
+                hvel={this.state.speed[0]}
                 vvel={this.state.speed[1]}
                 rotation={this.state.rotation}
                 onPad={this.state.onPad}
@@ -194,6 +207,7 @@ class Game extends Component {
                 fuel={this.state.fuel}/>
           <div className="pad" style={{ marginLeft: this.state.pad+"px", width:this.state.padSize}}/>
           <div className="game-over">{this.state.gameState}</div>
+          <MainMenu start={this._startGame} mainMenu={this.state.mainMenu}/>
         </div>
         <div className="moon" style={{width:this.state.width}}></div>
 
