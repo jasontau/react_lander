@@ -45,7 +45,7 @@
 
 .game {
   position: relative;
-  background-image: url("background.jpg");
+  background-image: url("./assets/background.jpg");
 }
 
 .pad {
@@ -54,12 +54,11 @@
   border-color: red;
   bottom: 0px;
   border-style:dashed;
-  /*background-image: url("moon.jpg");*/
 }
 
 .moon {
   height: 30px;
-  background-image: url("moon.jpg");
+  background-image: url("./assets/moon.jpg");
 }
 
 .ship {

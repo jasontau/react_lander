@@ -21,7 +21,7 @@ class Game extends Component {
       shipSize: 64,
       ship: null,
       gameState: "",
-      shipSrc: require("../src/spaceship.png"),
+      shipSrc: require("../src/assets/spaceship.png"),
       fuel: 900,
 
       // menu
@@ -119,7 +119,7 @@ class Game extends Component {
       if (this.state.onSpeed && this.state.onPad && this.state.onRotation){
         gameState = {gameState: "You Win!"};
       } else {
-        gameState = {gameState: "You Crashed!", shipSrc:require("../src/Explosion.png")};
+        gameState = {gameState: "You Crashed!", shipSrc:require("../src/assets/Explosion.png")};
       }
 
       let endState = Object.assign({}, gameState, {mainMenu: true});
