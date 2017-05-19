@@ -8,7 +8,7 @@ export default class Hud extends Component {
 
   render() {
     return(
-      <div className="hud">
+      <div className="hud" style={{visibility: this.props.mainMenu ? "hidden" : "visible"}}>
         <div>Hor. Vel:{parseFloat(this.props.hvel).toFixed(1)}</div>
         <div>Ver. Vel:{parseFloat(this.props.vvel).toFixed(1)}</div>
         <div>Rotation:{parseFloat(this.props.rotation).toFixed(1)}</div>
