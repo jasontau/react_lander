@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {gameSettings, gameStartState} from './gameSettings';
+import {gameSettings, gameStartState} from './gameSettings/gameSettings';
 import Hud from './hud/hud';
 import MainMenu from './mainmenu/mainmenu';
 import logo from './logo.svg';

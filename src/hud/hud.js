@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import {gameSettings} from '../gameSettings';
 
 export default class Hud extends Component {
   _getStatusStyle(bool){

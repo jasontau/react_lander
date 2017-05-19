@@ -18,6 +18,6 @@ export const gameStartState = {
   rotation: 0,
   shipSize: 64,
   gameState: "",
-  shipSrc: require("../src/assets/spaceship.png"),
+  shipSrc: require("../assets/spaceship.png"),
   fuel: 900,
 }
