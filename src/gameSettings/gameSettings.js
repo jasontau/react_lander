@@ -12,6 +12,7 @@ export const gameSettings = {
     LEVEL_WIDTH: 900,
     PAD_SIZE: 100,
     PAD_LOCATION: 100,
+    SHIP_SIZE: 64,
 }
 
 export const gameStartState = {

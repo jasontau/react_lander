@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {gameSettings, gameStartState} from './gameSettings/gameSettings';
 import Hud from './hud/hud';
 import MainMenu from './mainmenu/mainmenu';
+import Controller from './controller/controller';
 import logo from './assets/logo.svg';
 import './Game.css';
 
@@ -18,7 +19,6 @@ class Game extends Component {
       turnLeft: false,
       turnRight: false,
       rotation: 0,
-      shipSize: 64,
       ship: null,
       gameState: "",
       shipSrc: require("../src/assets/spaceship.png"),
@@ -35,42 +35,42 @@ class Game extends Component {
   }
 
   // Controls ==============================
-  _handleKeyPress = (event) => {
-    if (event.key === 'w' && this.state.engines === false){
-      this.setState({engines: true});
-    }
+  // _handleKeyPress = (event) => {
+  //   if (event.key === 'w' && this.state.engines === false){
+  //     this.setState({engines: true});
+  //   }
+  //
+  //   if (event.key === 'a') {
+  //     this.setState({turnLeft: true})
+  //   } else if (event.key === 'd') {
+  //     this.setState({turnRight: true})
+  //   }
+  // }
+  //
+  // _handleKeyUp = (event) => {
+  //   // keyup events are all independent of each other to prevent key stickiness
+  //   if (event.key === 'w' && this.state.engines){
+  //     this.setState({engines: false})
+  //   }
+  //
+  //   if (event.key === 'a' && this.state.turnLeft){
+  //     this.setState({turnLeft: false})
+  //   }
+  //
+  //   if (event.key === 'd' && this.state.turnRight){
+  //     this.setState({turnRight: false})
+  //   }
+  // }
 
-    if (event.key === 'a') {
-      this.setState({turnLeft: true})
-    } else if (event.key === 'd') {
-      this.setState({turnRight: true})
-    }
-  }
-
-  _handleKeyUp = (event) => {
-    // keyup events are all independent of each other to prevent key stickiness
-    if (event.key === 'w' && this.state.engines){
-      this.setState({engines: false})
-    }
-
-    if (event.key === 'a' && this.state.turnLeft){
-      this.setState({turnLeft: false})
-    }
-
-    if (event.key === 'd' && this.state.turnRight){
-      this.setState({turnRight: false})
-    }
-  }
-
-  _updateCrashStates(){
-    let shipPosition = this.state.ship.getBoundingClientRect()["left"];
-    this.setState({
-      onPad:      shipPosition+10 > gameSettings.PAD_LOCATION
-                  && (shipPosition+this.state.shipSize-17) < gameSettings.PAD_LOCATION + gameSettings.PAD_SIZE,
-      onSpeed:    this.state.speed[1] >= -gameSettings.MAX_LANDING_SPEED,
-      onRotation: Math.abs(this.state.rotation) <= gameSettings.MAX_LANDING_ROTATION,
-    });
-  }
+  // _updateCrashStates(){
+  //   let shipPosition = this.state.ship.getBoundingClientRect()["left"];
+  //   this.setState({
+  //     onPad:      shipPosition+10 > gameSettings.PAD_LOCATION
+  //                 && (shipPosition+gameSettings.SHIP_SIZE-17) < gameSettings.PAD_LOCATION + gameSettings.PAD_SIZE,
+  //     onSpeed:    this.state.speed[1] >= -gameSettings.MAX_LANDING_SPEED,
+  //     onRotation: Math.abs(this.state.rotation) <= gameSettings.MAX_LANDING_ROTATION,
+  //   });
+  // }
 
   // =========== Game Loop function ===========
   // all operations on game pawn handled here for consistent player feedback
@@ -83,7 +83,7 @@ class Game extends Component {
     let thrust = [0,0];
     let fuel = this.state.fuel;
 
-    this._updateCrashStates()
+    // this._updateCrashStates()
 
     // Handle rotation: -180 to 180 rotation
     if (this.state.turnRight){
@@ -134,7 +134,7 @@ class Game extends Component {
   _checkWin(){
     let shipPosition = this.state.ship.getBoundingClientRect()["left"];
     //TODO: remove hack as the ship graphic is a few pixels in from the borders
-    let onPad = shipPosition+10 > gameSettings.PAD_LOCATION && (shipPosition+this.state.shipSize-17) < gameSettings.PAD_LOCATION + gameSettings.PAD_SIZE;
+    let onPad = shipPosition+10 > gameSettings.PAD_LOCATION && (shipPosition+gameSettings.SHIP_SIZE-17) < gameSettings.PAD_LOCATION + gameSettings.PAD_SIZE;
     let didNotCrash = this.state.speed[1] <= gameSettings.MAX_LANDING_SPEED;
     return onPad && didNotCrash;
   }
@@ -165,17 +165,17 @@ class Game extends Component {
   }
 
   // TODO: look for alternatives to attaching to window DOM
-  componentDidMount() {
-    window.addEventListener("keydown", this._handleKeyPress);
-    window.addEventListener("keyup", this._handleKeyUp);
-    this.setState({ship:this.refs.ship});
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("keydown", this._handleKeyPress);
-    window.removeEventListener("keyup", this._handleKeyUp);
-    clearInterval(this.tick)
-  }
+  // componentDidMount() {
+  //   window.addEventListener("keydown", this._handleKeyPress);
+  //   window.addEventListener("keyup", this._handleKeyUp);
+  //   this.setState({ship:this.refs.ship});
+  // }
+  //
+  // componentWillUnmount() {
+  //   window.removeEventListener("keydown", this._handleKeyPress);
+  //   window.removeEventListener("keyup", this._handleKeyUp);
+  //   clearInterval(this.tick)
+  // }
 
   // =========================================
 
@@ -184,17 +184,18 @@ class Game extends Component {
       <div className="App">
 
         <div className="game"
-              style={{  height:gameSettings.LEVEL_HEIGHT+this.state.shipSize,
+              style={{  height:gameSettings.LEVEL_HEIGHT+gameSettings.SHIP_SIZE,
                         width:gameSettings.LEVEL_WIDTH,}}>
           <img  id="ship" ref="ship"
                 style={{  bottom:this.state.position[1],
                           left:this.state.position[0],
                           transform:'rotate('+this.state.rotation+'deg)',
-                          height: this.state.shipSize,
+                          height: gameSettings.SHIP_SIZE,
                         }}
                 src={this.state.shipSrc}
                 className={'ship'}
                 alt="logo" />
+          <Controller/>
           <Hud  mainMenu={this.state.mainMenu}
                 hvel={this.state.speed[0]}
                 vvel={this.state.speed[1]}
