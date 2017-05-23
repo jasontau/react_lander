@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {gameSettings, gameStartState} from './gameSettings/gameSettings';
 import Hud from './hud/hud';
 import MainMenu from './mainmenu/mainmenu';
-import logo from './logo.svg';
+import logo from './assets/logo.svg';
 import './Game.css';
 
 class Game extends Component {
@@ -31,17 +31,11 @@ class Game extends Component {
       onPad: false,
       onSpeed: false,
       onRotation: false,
-
-      // level
-      floor: 600,
-      width: 900,
-      pad: Math.floor(Math.random()* 800),
-      padSize: 100,
     }
   }
 
   // Controls ==============================
-  _handleKeyPress(event) {
+  _handleKeyPress = (event) => {
     if (event.key === 'w' && this.state.engines === false){
       this.setState({engines: true});
     }
@@ -53,7 +47,7 @@ class Game extends Component {
     }
   }
 
-  _handleKeyUp(event) {
+  _handleKeyUp = (event) => {
     // keyup events are all independent of each other to prevent key stickiness
     if (event.key === 'w' && this.state.engines){
       this.setState({engines: false})
@@ -71,8 +65,8 @@ class Game extends Component {
   _updateCrashStates(){
     let shipPosition = this.state.ship.getBoundingClientRect()["left"];
     this.setState({
-      onPad:      shipPosition+10 > this.state.pad
-                  && (shipPosition+this.state.shipSize-17) < this.state.pad + this.state.padSize,
+      onPad:      shipPosition+10 > gameSettings.PAD_LOCATION
+                  && (shipPosition+this.state.shipSize-17) < gameSettings.PAD_LOCATION + gameSettings.PAD_SIZE,
       onSpeed:    this.state.speed[1] >= -gameSettings.MAX_LANDING_SPEED,
       onRotation: Math.abs(this.state.rotation) <= gameSettings.MAX_LANDING_ROTATION,
     });
@@ -112,7 +106,7 @@ class Game extends Component {
 
 
     // Handle position
-    if (this.state.position[1] > this.state.floor * -1){
+    if (this.state.position[1] > gameSettings.LEVEL_HEIGHT * -1){
       speed[1] = speed[1] - gameSettings.GRAVITY;
     } else {
       let gameState = null;
@@ -122,7 +116,7 @@ class Game extends Component {
         gameState = {gameState: "You Crashed!", shipSrc:require("../src/assets/Explosion.png")};
       }
 
-      let endState = Object.assign({}, gameState, {mainMenu: true});
+      let endState = Object.assign({}, gameState, { mainMenu: true });
       this.setState(endState);
       clearInterval(this.tick);
       speed = [0,0];
@@ -140,7 +134,7 @@ class Game extends Component {
   _checkWin(){
     let shipPosition = this.state.ship.getBoundingClientRect()["left"];
     //TODO: remove hack as the ship graphic is a few pixels in from the borders
-    let onPad = shipPosition+10 > this.state.pad && (shipPosition+this.state.shipSize-17) < this.state.pad + this.state.padSize;
+    let onPad = shipPosition+10 > gameSettings.PAD_LOCATION && (shipPosition+this.state.shipSize-17) < gameSettings.PAD_LOCATION + gameSettings.PAD_SIZE;
     let didNotCrash = this.state.speed[1] <= gameSettings.MAX_LANDING_SPEED;
     return onPad && didNotCrash;
   }
@@ -160,22 +154,26 @@ class Game extends Component {
             ]
   }
 
+  _generatePad = (levelWidth, padSize) => {
+    return Math.floor(Math.random() * (levelWidth - padSize))
+  }
+
   _startGame = () => {
-    let startState = Object.assign({}, {mainMenu: false}, gameStartState);
+    let startState = Object.assign({}, {mainMenu: false, pad: this._generatePad(gameSettings.LEVEL_HEIGHT, gameSettings.PAD_SIZE)}, gameStartState);
     this.setState(startState);
     this.tick = setInterval(this._tick.bind(this), 33);
   }
 
   // TODO: look for alternatives to attaching to window DOM
   componentDidMount() {
-    window.addEventListener("keydown", this._handleKeyPress.bind(this));
-    window.addEventListener("keyup", this._handleKeyUp.bind(this));
+    window.addEventListener("keydown", this._handleKeyPress);
+    window.addEventListener("keyup", this._handleKeyUp);
     this.setState({ship:this.refs.ship});
   }
 
   componentWillUnmount() {
-    window.removeEventListener("keydown", this._handleKeyPress.bind(this));
-    window.removeEventListener("keyup", this._handleKeyUp.bind(this));
+    window.removeEventListener("keydown", this._handleKeyPress);
+    window.removeEventListener("keyup", this._handleKeyUp);
     clearInterval(this.tick)
   }
 
@@ -186,8 +184,8 @@ class Game extends Component {
       <div className="App">
 
         <div className="game"
-              style={{  height:this.state.floor+this.state.shipSize,
-                        width:this.state.width,}}>
+              style={{  height:gameSettings.LEVEL_HEIGHT+this.state.shipSize,
+                        width:gameSettings.LEVEL_WIDTH,}}>
           <img  id="ship" ref="ship"
                 style={{  bottom:this.state.position[1],
                           left:this.state.position[0],
@@ -205,11 +203,11 @@ class Game extends Component {
                 onSpeed={this.state.onSpeed}
                 onRotation={this.state.onRotation}
                 fuel={this.state.fuel}/>
-          <div className="pad" style={{ marginLeft: this.state.pad+"px", width:this.state.padSize}}/>
+          <div className="pad" style={{ marginLeft: gameSettings.PAD_LOCATION+"px", width:gameSettings.PAD_SIZE}}/>
           <div className="game-over">{this.state.gameState}</div>
           <MainMenu start={this._startGame} mainMenu={this.state.mainMenu}/>
         </div>
-        <div className="moon" style={{width:this.state.width}}></div>
+        <div className="moon" style={{width:gameSettings.LEVEL_WIDTH}}></div>
 
       </div>
     );

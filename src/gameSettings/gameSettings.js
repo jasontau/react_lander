@@ -6,6 +6,12 @@ export const gameSettings = {
     // Win Conditions
     MAX_LANDING_SPEED:5,
     MAX_LANDING_ROTATION: 20,
+
+    // Level Settings
+    LEVEL_HEIGHT: 600,
+    LEVEL_WIDTH: 900,
+    PAD_SIZE: 100,
+    PAD_LOCATION: 100,
 }
 
 export const gameStartState = {
